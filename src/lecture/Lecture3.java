@@ -5,50 +5,56 @@ import java.util.Scanner;
 public class Lecture3 {
 	
 	public static void main(String[] args) {
-		
+
 		Scanner scanner = new Scanner(System.in);
-	
+
 		// 1번 게시물 저장소
 		int article1__id = 0;
 		String article1__title = "";
 		String article1__body = "";
-		
+
 		// 2번 게시물 저장소
 		int article2__id = 0;
 		String article2__title = "";
 		String article2__body = "";
+
+		
 		int lastArticleId = 0;
+		
+		
 		while (true) {
 			System.out.printf("명령어) ");
 			String command = scanner.nextLine();
 
-			
-			if (command.equals("article detail 1")) {
-				int inputedId = 1;
+			if (command.startsWith("article detail ")) {
+				int inputedId = Integer.parseInt(command.split(" ")[2]);
+
 				System.out.println("== 게시물 상세 ==");
 
-				if ( article1__id == 0 ) {
+				if (inputedId == 1) {
+					if (article1__id == 0) {
+						System.out.printf("%d번 게시물은 존재하지 않습니다.\n", inputedId);
+						continue;
+					}
+
+					System.out.printf("번호 : %s\n", article1__id);
+					System.out.printf("제목 : %s\n", article1__title);
+					System.out.printf("내용 : %s\n", article1__body);
+				} else if (inputedId == 2) {
+					if (article2__id == 0) {
+						System.out.printf("%d번 게시물은 존재하지 않습니다.\n", inputedId);
+						continue;
+					}
+
+					System.out.printf("번호 : %s\n", article2__id);
+					System.out.printf("제목 : %s\n", article2__title);
+					System.out.printf("내용 : %s\n", article2__body);
+				} else {
 					System.out.printf("%d번 게시물은 존재하지 않습니다.\n", inputedId);
-					continue;
 				}
 
-				System.out.printf("번호 : %s\n", article1__id);
-				System.out.printf("제목 : %s\n", article1__title);
-				System.out.printf("내용 : %s\n", article1__body);
 			}
-			else if (command.equals("article detail 2")) {
-				int inputedId = 2;
-				System.out.println("== 게시물 상세 ==");
 
-				if ( article2__id == 0 ) {
-					System.out.printf("%d번 게시물은 존재하지 않습니다.\n", inputedId);
-					continue;
-				}
-
-				System.out.printf("번호 : %s\n", article2__id);
-				System.out.printf("제목 : %s\n", article2__title);
-				System.out.printf("내용 : %s\n", article2__body);
-			}
 			else if (command.equals("article list")) {
 				System.out.println("== 게시물 리스트 ==");
 
@@ -89,7 +95,7 @@ public class Lecture3 {
 				break;
 			}
 
-	}
+		}
 		scanner.close();
-}
+	}
 }
