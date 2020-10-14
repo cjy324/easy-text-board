@@ -5,7 +5,7 @@ import java.util.Scanner;
 public class Lecture3 {
 	
 	public static void main(String[] args) {
-	
+		
 		Scanner scanner = new Scanner(System.in);
 	
 		// 1번 게시물 저장소
@@ -22,7 +22,7 @@ public class Lecture3 {
 			System.out.printf("명령어) ");
 			String command = scanner.nextLine();
 
-			if (command.equals("article list")) {
+			
 			if (command.equals("article detail 1")) {
 				int inputedId = 1;
 				System.out.println("== 게시물 상세 ==");
@@ -82,15 +82,14 @@ public class Lecture3 {
 					article2__body = body;
 				}
 				System.out.printf("%d번 게시물이 생성되었습니다.\n", id);
-				// 가장 마지막 게시물 번호를 갱신한다.
-				// 왜냐하면 방금 새 게시물이 생성되었기 때문.
+
 				lastArticleId = id;
 			} else if (command.equals("system exit")) {
 				System.out.println("== 프로그램 종료 ==");
 				break;
 			}
-		}
-		scanner.close();
+
 	}
+		scanner.close();
 }
 }
