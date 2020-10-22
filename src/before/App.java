@@ -2,29 +2,24 @@ package before;
 
 import java.util.Scanner;
 
-//20.10.21
-//게시물 개수 구하는 함수를 만들어서 전체 소스코드에 적용[]
-//게시물 객체를 미리 만들지 않고, 필요할 때 마다 만들기[]
-//게시물 삭제 기능 구현[]
-//게시물 수정 기능 구현[]
-//게시물 내용 검색 기능 구현[]
-//게시물 리스팅 시 최신 등록 순서대로 출력[]
-//게시물 등록시 현재 날짜 "yyyy-MM-dd HH:mm:ss" 형식으로 입력 구현[]
-
 public class App {
-	Article[] articles = new Article[3];
+	Article[] articles = new Article[10];
 	int lastArticleId = 0;
 
+	int articlesSize = 0;
+
+	int articlesSize() {
+		return articlesSize;
+	}
+
 	Article getArticle(int id) {
-		if (id < 1) {
+
+		int index = getIndexById(id);
+
+		if (index == -1) {
 			return null;
 		}
-
-		if (id > lastArticleId) {
-			return null;
-		}
-
-		return articles[id - 1];
+		return articles[index];
 	}
 
 	public void run() {
@@ -47,7 +42,7 @@ public class App {
 			} else if (command.equals("article add")) {
 				System.out.println("== 게시물 등록 ==");
 
-				if (lastArticleId >= maxArticlesCount) {
+				if (articlesSize() >= maxArticlesCount) {
 					System.out.println("더 이상 생성할 수 없습니다.");
 					continue;
 				}
@@ -63,29 +58,34 @@ public class App {
 				System.out.printf("내용 : ");
 				body = sc.nextLine();
 
-				Article article = getArticle(id);
+				Article article = new Article();
 
 				article.id = id;
 				article.title = title;
 				article.body = body;
 
 				System.out.printf("%d번 게시물이 생성되었습니다.\n", id);
+
+				articles[articlesSize] = article;
+				articlesSize++;
+
 			} else if (command.equals("article list")) {
 				System.out.println("== 게시물 리스트 ==");
 
-				if (lastArticleId == 0) {
+				if (articlesSize() == 0) {
 					System.out.println("게시물이 존재하지 않습니다.");
 					continue;
 				}
 
 				System.out.println("번호 / 제목");
 
-				for (int i = 1; i <= lastArticleId; i++) {
-					Article article = getArticle(i);
-
+				for (int i = articlesSize() - 1; i >= 0; i--) {
+					Article article = articles[i];
 					System.out.printf("%d / %s\n", article.id, article.title);
 				}
-			} else if (command.startsWith("article detail ")) {
+			}
+
+			else if (command.startsWith("article detail ")) {
 				int inputedId = Integer.parseInt(command.split(" ")[2]);
 				System.out.println("== 게시물 상세 ==");
 
@@ -99,10 +99,85 @@ public class App {
 				System.out.printf("번호 : %d\n", article.id);
 				System.out.printf("제목 : %s\n", article.title);
 				System.out.printf("내용 : %s\n", article.body);
+			} else if (command.startsWith("article delete ")) {
+				int inputedId = Integer.parseInt(command.split(" ")[2]);
+				System.out.println("== 게시물 삭제 ==");
+
+				Article article = getArticle(inputedId);
+
+				if (article == null) {
+					System.out.printf("%d번 게시물은 존재하지 않습니다.\n", inputedId);
+					continue;
+				}
+
+				removeArticle(inputedId);
+				System.out.printf("%d번 게시물이 삭제되었습니다.\n", inputedId);
+
+			} else if (command.startsWith("article modify ")) {
+				int inputedId = Integer.parseInt(command.split(" ")[2]);
+				System.out.println("== 게시물 수정 ==");
+
+				Article article = getArticle(inputedId);
+
+				if (article == null) {
+					System.out.printf("%d번 게시물은 존재하지 않습니다.\n", inputedId);
+					continue;
+				}
+
+				System.out.printf("수정할 제목 : ");
+				article.title = sc.nextLine();
+				System.out.printf("수정할 내용 : ");
+				article.body = sc.nextLine();
+
+				System.out.printf("== %d번 게시물 수정 결과 ==\n", inputedId);
+				System.out.printf("번호 : %d\n", article.id);
+				System.out.printf("제목 : %s\n", article.title);
+				System.out.printf("내용 : %s\n", article.body);
+			} else if (command.startsWith("article search ")) {
+				String inputedWord = command.split(" ")[2];
+				System.out.println("== 게시물 검색 ==");
+
+				if (articlesSize() == 0) {
+					System.out.println("게시물이 존재하지 않습니다.");
+					continue;
+				}
+
+				System.out.println("번호 / 제목 / 내용");
+
+				for (int i = 0; i < articlesSize(); i++) {
+					Article article = articles[i];
+					if (articles[i].body.contains(inputedWord)) {
+
+						System.out.printf("%d / %s / %s\n", article.id, article.title, article.body);
+					}
+				}
+
 			}
+
 		}
 
 		sc.close();
+	}
+
+	private void removeArticle(int inputedId) {
+		int index = getIndexById(inputedId);
+		if (index == -1) {
+			return;
+		}
+		for (int i = index + 1; i < articlesSize(); i++) {
+
+			articles[i - 1] = articles[i];
+		}
+		articlesSize--;
+	}
+
+	private int getIndexById(int inputedId) {
+		for (int i = 0; i <= articlesSize(); i++) {
+			if (articles[i].id == inputedId) {
+				return i;
+			}
+		}
+		return -1;
 	}
 
 }
