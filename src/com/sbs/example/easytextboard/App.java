@@ -121,10 +121,88 @@ public class App {
 				int id = add(title, body);
 
 				System.out.printf("%d번 게시물이 생성되었습니다.\n", id);
+			} else if (command.startsWith("article search ")) {
+				// 만약 "article search 검색어" 
+				// 위 내용처럼 페이지수를 입력하지 않는 경우가 있을 수 있음
+				String[] commandBits = command.split(" ");
+				String searchKeyword = commandBits[2];
+				
+				// 따라서, 기본 page수는 1로 설정(입력값이 없어도 1page는 나오게끔)
+				int page = 1;  
+
+				//그리고 만약 입력한 내용이 4칸 이상 넘어가는 경우
+				//ex) "article(1) search(2) 검색어(3) 00(4) 00(5) 00(6)"
+				//page는 4칸에 입력된 값을 받는다??
+				if (commandBits.length >= 4) {
+					page = Integer.parseInt(commandBits[3]);
+				}
+				
+				
+				if (page <= 1) {
+					page = 1;
+				}
+
+				System.out.println("== 게시물 검색 ==");
+
+				int searchResultArticlesLen = 0;
+
+				// 검색된 결과의 수를 먼저 구하기
+				// 향상된 for문 
+				// for(int i= 0; i < articles.length; i++)와 같은 의미
+				for (Article article : articles) {
+					if(article == null) {
+						break;
+					}
+					if (article.title.contains(searchKeyword)) {
+						searchResultArticlesLen++;
+					}
+				}
+
+				
+				//검색된 게시물 배열 만들기
+				Article[] searchResultArticles = new Article[searchResultArticlesLen];
+
+				int searchResultArticlesIndex = 0;
+				for (Article article : articles) {
+					if(article == null) {
+						break;
+					}
+					if (article.title.contains(searchKeyword)) {
+						searchResultArticles[searchResultArticlesIndex] = article;
+						searchResultArticlesIndex++;
+					}
+				}
+
+				if (searchResultArticles.length == 0) {
+					System.out.println("검색결과가 존재하지 않습니다.");
+					continue;
+				}
+
+				System.out.println("번호 / 제목");
+
+				int itemsInAPage = 10;
+				int startPos = searchResultArticles.length - 1;
+				startPos -= (page - 1) * itemsInAPage;
+				int endPos = startPos - (itemsInAPage - 1);
+
+				if (endPos < 0) {
+					endPos = 0;
+				}
+
+				if (startPos < 0) {
+					System.out.printf("%d페이지는 존재하지 않습니다.\n", page);
+					continue;
+				}
+
+				for (int i = startPos; i >= endPos; i--) {
+					Article article = searchResultArticles[i];
+
+					System.out.printf("%d / %s\n", article.id, article.title);
+				}
 			} else if (command.startsWith("article list ")) {
 				int page = Integer.parseInt(command.split(" ")[2]);
-				
-				if ( page <= 1 ) {
+
+				if (page <= 1) {
 					page = 1;
 				}
 
