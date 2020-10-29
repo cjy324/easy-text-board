@@ -1,26 +1,27 @@
 package com.sbs.example.easytextboard;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
-public class App {
-	private Article[] articles;
-	private int lastArticleId;
-	private int articlesSize;
+import com.sbs.example.easytextboard.controller.MemberController;
+import com.sbs.example.easytextboard.dto.Article;
+import com.sbs.example.easytextboard.dto.Member;
 
+public class App {
+	private List<Article> articles;
+	private int lastArticleId;
+	
 	public App() {
-		articles = new Article[32];
 		lastArticleId = 0;
-		articlesSize = 0;
+		articles = new ArrayList<>();
 
 		for (int i = 0; i < 32; i++) {
 			add("제목" + (i + 1), "내용" + (i + 1));
 		}
 	}
 
-	private int articlesSize() {
-		return articlesSize;
-	}
-
+	// 게시물관련 시작
 	private Article getArticle(int id) {
 		int index = getIndexById(id);
 
@@ -28,38 +29,19 @@ public class App {
 			return null;
 		}
 
-		return articles[index];
-	}
-
-	private boolean isArticlesFull() {
-		return articlesSize == articles.length;
+		return articles.get(index);
 	}
 
 	private int add(String title, String body) {
 		// 만약에 현재 꽉 차 있다면
 		// 새 업체과 계약한다.
 
-		if (isArticlesFull()) {
-			System.out.printf("== 배열 사이즈 증가(%d => %d) ==\n", articles.length, articles.length * 2);
-
-			Article[] newArticles = new Article[articles.length * 2];
-
-			for (int i = 0; i < articles.length; i++) {
-				newArticles[i] = articles[i];
-			}
-
-			articles = newArticles;
-		}
-
 		Article article = new Article();
 
 		article.id = lastArticleId + 1;
 		article.title = title;
 		article.body = body;
-
-		articles[articlesSize] = article;
-
-		articlesSize++;
+		articles.add(article);
 		lastArticleId = article.id;
 
 		return article.id;
@@ -72,16 +54,12 @@ public class App {
 			return;
 		}
 
-		for (int i = index + 1; i < articlesSize(); i++) {
-			articles[i - 1] = articles[i];
-		}
-
-		articlesSize--;
+		articles.remove(index);
 	}
 
 	private int getIndexById(int id) {
-		for (int i = 0; i < articlesSize(); i++) {
-			if (articles[i].id == id) {
+		for (int i = 0; i < articles.size(); i++) {
+			if (articles.get(i).id == id) {
 				return i;
 			}
 		}
@@ -94,10 +72,13 @@ public class App {
 		article.title = title;
 		article.body = body;
 	}
+	// 게시물관련 끝
 
 	// 가장 상위층 시작
 	public void run() {
 		Scanner sc = new Scanner(System.in);
+		
+		MemberController memberController = new MemberController();
 
 		while (true) {
 
@@ -107,6 +88,8 @@ public class App {
 			if (command.equals("system exit")) {
 				System.out.println("== 프로그램 종료 ==");
 				break;
+			} else if (command.equals("member join")) {
+				memberController.run(sc, command);
 			} else if (command.equals("article add")) {
 				System.out.println("== 게시물 등록 ==");
 
@@ -122,58 +105,32 @@ public class App {
 
 				System.out.printf("%d번 게시물이 생성되었습니다.\n", id);
 			} else if (command.startsWith("article search ")) {
-				// 만약 "article search 검색어" 
-				// 위 내용처럼 페이지수를 입력하지 않는 경우가 있을 수 있음
-				String[] commandBits = command.split(" ");
-				String searchKeyword = commandBits[2];
-				
-				// 따라서, 기본 page수는 1로 설정(입력값이 없어도 1page는 나오게끔)
-				int page = 1;  
 
-				//그리고 만약 입력한 내용이 4칸 이상 넘어가는 경우
-				//ex) "article(1) search(2) 검색어(3) 00(4) 00(5) 00(6)"
-				//page는 4칸에 입력된 값을 받는다??
+				String[] commandBits = command.split(" ");
+
+				String searchKeyword = commandBits[2];
+
+				int page = 1;
+
 				if (commandBits.length >= 4) {
 					page = Integer.parseInt(commandBits[3]);
 				}
-				
-				
+
 				if (page <= 1) {
 					page = 1;
 				}
 
 				System.out.println("== 게시물 검색 ==");
 
-				int searchResultArticlesLen = 0;
+				List<Article> searchResultArticles = new ArrayList<>();
 
-				// 검색된 결과의 수를 먼저 구하기
-				// 향상된 for문 
-				// for(int i= 0; i < articles.length; i++)와 같은 의미
 				for (Article article : articles) {
-					if(article == null) {
-						break;
-					}
 					if (article.title.contains(searchKeyword)) {
-						searchResultArticlesLen++;
+						searchResultArticles.add(article);
 					}
 				}
 
-				
-				//검색된 게시물 배열 만들기
-				Article[] searchResultArticles = new Article[searchResultArticlesLen];
-
-				int searchResultArticlesIndex = 0;
-				for (Article article : articles) {
-					if(article == null) {
-						break;
-					}
-					if (article.title.contains(searchKeyword)) {
-						searchResultArticles[searchResultArticlesIndex] = article;
-						searchResultArticlesIndex++;
-					}
-				}
-
-				if (searchResultArticles.length == 0) {
+				if (searchResultArticles.size() == 0) {
 					System.out.println("검색결과가 존재하지 않습니다.");
 					continue;
 				}
@@ -181,7 +138,7 @@ public class App {
 				System.out.println("번호 / 제목");
 
 				int itemsInAPage = 10;
-				int startPos = searchResultArticles.length - 1;
+				int startPos = searchResultArticles.size() - 1;
 				startPos -= (page - 1) * itemsInAPage;
 				int endPos = startPos - (itemsInAPage - 1);
 
@@ -195,7 +152,7 @@ public class App {
 				}
 
 				for (int i = startPos; i >= endPos; i--) {
-					Article article = searchResultArticles[i];
+					Article article = searchResultArticles.get(i);
 
 					System.out.printf("%d / %s\n", article.id, article.title);
 				}
@@ -208,7 +165,7 @@ public class App {
 
 				System.out.println("== 게시물 리스트 ==");
 
-				if (articlesSize() == 0) {
+				if (articles.size() == 0) {
 					System.out.println("게시물이 존재하지 않습니다.");
 					continue;
 				}
@@ -216,7 +173,7 @@ public class App {
 				System.out.println("번호 / 제목");
 
 				int itemsInAPage = 10;
-				int startPos = articlesSize() - 1;
+				int startPos = articles.size() - 1;
 				startPos -= (page - 1) * itemsInAPage;
 				int endPos = startPos - (itemsInAPage - 1);
 
@@ -230,12 +187,20 @@ public class App {
 				}
 
 				for (int i = startPos; i >= endPos; i--) {
-					Article article = articles[i];
+					Article article = articles.get(i);
 
 					System.out.printf("%d / %s\n", article.id, article.title);
 				}
 			} else if (command.startsWith("article detail ")) {
-				int inputedId = Integer.parseInt(command.split(" ")[2]);
+				int inputedId = 0;
+
+				try {
+					inputedId = Integer.parseInt(command.split(" ")[2]);
+				} catch (NumberFormatException e) {
+					System.out.println("게시물 번호를 양의 정수로 입력해주세요.");
+					continue;
+				}
+
 				System.out.println("== 게시물 상세 ==");
 
 				Article article = getArticle(inputedId);
