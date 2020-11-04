@@ -11,19 +11,25 @@ public class MemberService {
 		memberDao = Container.memberDao;
 	}
 
-	public Member getMemberByLoginId(String loginId) {
-		return memberDao.getMemberByLoginId(loginId);
-	}
-
 	public int join(String loginId, String loginPw, String name) {
 		return memberDao.join(loginId, loginPw, name);
 	}
 
-	private boolean isExistsLoginId(String loginId) {
-		return memberDao.isExistsLoginId(loginId);
+	public boolean isJoinableLoginId(String loginId) {
+		Member member = memberDao.getMemberByLoginId(loginId);
+
+		if (member != null) {
+			return false;
+		}
+
+		return true;
 	}
 
-	public boolean isJoinAvailabelLoginId(String loginId) {
-		return memberDao.isJoinAvailabelLoginId(loginId);
+	public Member getMemberByLoginId(String loginId) {
+		return memberDao.getMemberByLoginId(loginId);
+	}
+
+	public Member getMemberById(int id) {
+		return memberDao.getMemberById(id);
 	}
 }

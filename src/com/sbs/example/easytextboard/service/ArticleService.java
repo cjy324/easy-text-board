@@ -13,31 +13,12 @@ public class ArticleService {
 		articleDao = Container.articleDao;
 	}
 
-	public int add(int memberId, String title, String body) {
-		return articleDao.add(memberId, title, body);
+	public int write(int memberId, String title, String body) {
+		return articleDao.write(memberId, title, body);
 	}
 
-	public List<Article> getArticles() {
-		return articleDao.getArticles();
+	public List<Article> getForPrintArticles() {
+		return articleDao.getForPrintArticles();
 	}
 
-	public int getArticlesSize() {
-		return articleDao.getArticlesSize();
-	}
-
-	public Article getArticleByIndex(int i) {
-		return articleDao.getArticleByIndex(i);
-	}
-
-	public Article getArticle(int id) {
-		return articleDao.getArticle(id);
-	}
-
-	public void modify(int id, String title, String body) {
-		articleDao.modify(id, title, body);
-	}
-
-	public void remove(int id) {
-		articleDao.remove(id);
-	}
 }

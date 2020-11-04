@@ -7,23 +7,33 @@ import com.sbs.example.easytextboard.dto.Member;
 
 public class MemberDao {
 	private List<Member> members;
-	private int lastMemberId;
+	private int lastId;
 
 	public MemberDao() {
-		lastMemberId = 0;
 		members = new ArrayList<>();
+		lastId = 0;
 
-		for (int i = 1; i <= 3; i++) {
-			join("user" + i, "user" + i, "유저" + i);
-		}
+		makeTestData();
 	}
 
-	public List<Member> getMembers() {
-		return members;
+	private void makeTestData() {
+		join("aaa", "aaa", "aaa");
+		join("bbb", "bbb", "bbb");
 	}
 
-	public int getLastMemberId() {
-		return lastMemberId;
+	public int join(String loginId, String loginPw, String name) {
+		Member member = new Member();
+
+		member.id = lastId + 1;
+		member.loginId = loginId;
+		member.loginPw = loginPw;
+		member.name = name;
+
+		members.add(member);
+
+		lastId = member.id;
+
+		return member.id;
 	}
 
 	public Member getMemberByLoginId(String loginId) {
@@ -36,38 +46,13 @@ public class MemberDao {
 		return null;
 	}
 
-	public int join(String loginId, String loginPw, String name) {
-		Member member = new Member();
-
-		member.id = lastMemberId + 1;
-		member.loginId = loginId;
-		member.loginPw = loginPw;
-		member.name = name;
-		members.add(member);
-		lastMemberId = member.id;
-
-		return member.id;
-	}
-
-	// isExistsLoginId
-	public boolean isExistsLoginId(String loginId) {
+	public Member getMemberById(int id) {
 		for (Member member : members) {
-			if (member.loginId.equals(loginId)) {
-				return true;
+			if (member.id == id) {
+				return member;
 			}
 		}
 
-		return false;
-	}
-	
-	public boolean isJoinAvailabelLoginId(String loginId) {
-
-		for (Member member : members) {
-			if (member.loginId.equals(loginId)) {
-				return false;
-			}
-		}
-
-		return true;
+		return null;
 	}
 }

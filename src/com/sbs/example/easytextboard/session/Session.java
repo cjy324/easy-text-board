@@ -3,11 +3,19 @@ package com.sbs.example.easytextboard.session;
 public class Session {
 	public int loginedMemberId;
 	
-	public boolean isLogined() {
-		return loginedMemberId != 0;
+	public Session() {
+		loginedMemberId = 0;
+	}
+
+	public void login(int id) {
+		loginedMemberId = id;
 	}
 	
-	public boolean isLogout() {
-		return !isLogined();
+	public void logout() {
+		loginedMemberId = 0;
+	}
+
+	public boolean isLogined() {
+		return loginedMemberId > 0;
 	}
 }

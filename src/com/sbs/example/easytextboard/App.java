@@ -2,32 +2,45 @@ package com.sbs.example.easytextboard;
 
 import java.util.Scanner;
 
+import com.sbs.example.easytextboard.container.Container;
 import com.sbs.example.easytextboard.controller.ArticleController;
+import com.sbs.example.easytextboard.controller.Controller;
 import com.sbs.example.easytextboard.controller.MemberController;
 
 public class App {
-	// 가장 상위층 시작
-	public void run() {
-		Scanner sc = new Scanner(System.in);
+	private MemberController memberController;
+	private ArticleController articleController;
 
-		MemberController memberController = new MemberController();
-		ArticleController articleController = new ArticleController();
+	public App() {
+		memberController = new MemberController();
+		articleController = new ArticleController();
+	}
+
+	public void run() {
+		Scanner sc = Container.scanner;
 
 		while (true) {
-
 			System.out.printf("명령어) ");
-			String command = sc.nextLine();
+			String cmd = sc.nextLine();
 
-			if (command.equals("system exit")) {
-				System.out.println("== 프로그램 종료 ==");
+			if (cmd.equals("system exit")) {
 				break;
-			} else if (command.startsWith("member ")) {
-				memberController.run(sc, command);
-			} else if (command.startsWith("article ")) {
-				articleController.run(sc, command);
 			}
+
+			Controller controller = getControllerByCmd(cmd);
+			controller.doCommand(cmd);
 		}
 
 		sc.close();
+	}
+
+	private Controller getControllerByCmd(String cmd) {
+		if (cmd.startsWith("member ")) {
+			return memberController;
+		} else if (cmd.startsWith("article ")) {
+			return articleController;
+		}
+
+		return null;
 	}
 }
